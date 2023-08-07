@@ -1,3 +1,6 @@
+Update 2 : OsintCmd-2
+
+
 Répertoire des meilleurs Tools d'Osint dans le CMD. 
 
 
