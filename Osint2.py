@@ -1,10 +1,9 @@
 import os
+import sys
 import click
 from colorama import init, Fore
-
-# Initialiser Colorama
 init(autoreset=True)
-
+# By SnowFish
 TOOLS = [
     {
         'name': 'Censys',
@@ -80,61 +79,66 @@ TOOLS = [
     }
 ]
 # By SnowFish
-def print_header():
-    header = Fore.CYAN + "By SnowFish\n" + Fore.RED + """
-                .-')                 .-') _  .-') _
-              ( OO ).              ( OO ) )(  OO) )
- .-'),-----. (_)---\_)  ,-.-') ,--./ ,--,' /     '._
-( OO'  .-.  '/    _ |   |  |OO)|   \ |  |\ |'--...__)
-/   |  | |  |\  :` `.   |  |  \|    \|  | )'--.  .--'
-\_) |  |\|  | '..'').)  |  |(_/|  .     |/    |  |
-  \ |  | |  |.-._)   \ ,|  |_.'|  |\    |     |  |
-   `'  '-'  '\       /(_|  |   |  | \   |     |  |
-     `-----'  `-----'   `--'   `--'  `--'     `--'
-"""
-    print(header.rjust(20, '\n').rstrip())  # Ajoute 20 lignes et décale vers la droite
-
+INTRO_TEXT = Fore.MAGENTA + '''
+  .-')        .-') _                (`\ .-') /`                     .-')                 .-') _  .-') _    
+ ( OO ).     ( OO ) )                `.( OO ),'                    ( OO ).              ( OO ) )(  OO) )   
+(_)---\_),--./ ,--,'  .-'),-----. ,--./  .--.         .-'),-----. (_)---\_)  ,-.-') ,--./ ,--,' /     '._  
+/    _ | |   \ |  |\ ( OO'  .-.  '|      |  |        ( OO'  .-.  '/    _ |   |  |OO)|   \ |  |\ |'--...__) 
+\  :` `. |    \|  | )/   |  | |  ||  |   |  |,       /   |  | |  |\  :` `.   |  |  \|    \|  | )'--.  .--' 
+ '..`''.)|  .     |/ \_) |  |\|  ||  |.'.|  |_)      \_) |  |\|  | '..`''.)  |  |(_/|  .     |/    |  |    
+.-._)   \|  |\    |    \ |  | |  ||         |          \ |  | |  |.-._)   \ ,|  |_.'|  |\    |     |  |    
+\       /|  | \   |     `'  '-'  '|   ,'.   |           `'  '-'  '\       /(_|  |   |  | \   |     |  |    
+ `-----' `--'  `--'       `-----' '--'   '--'             `-----'  `-----'   `--'   `--'  `--'     `--'    
+'''
+# By SnowFish
+def print_main_menu():
+    os.system('cls' if os.name == 'nt' else 'clear')  # Efface l'écran de la console
+    print(INTRO_TEXT)
+    print(Fore.RED + "Bienvenue dans l'interface OSINT !")
+    for index, tool in enumerate(TOOLS, start=1):
+        if tool['name'] != "Invid":
+            print(Fore.YELLOW + f"{index: <3}) {tool['name']}")
+# By SnowFish
+    print(Fore.RED + f"\n 0) Quitter")
+    choice = click.prompt(Fore.RED + "\nChoisissez un outil (1-12)", type=int, default=0, show_default=False)
+    # By SnowFish
+    if choice == 0:
+        print(Fore.RED + "Au revoir !")
+        sys.exit(0)
+# By SnowFish
+    if 1 <= choice <= len(TOOLS):
+        tool = [t for t in TOOLS if t['name'] != "Invid"][choice - 1]
+        show_tool_details(tool)
+    else:
+        print(Fore.RED + "Choix invalide.")
+# By SnowFish
+def show_tool_details(tool):
+    os.system('cls' if os.name == 'nt' else 'clear')  # Efface l'écran de la console
+    print(INTRO_TEXT)
+    print(Fore.RED + f"{tool['name']} - Description (English):")
+    print(Fore.CYAN + tool['description_en'])
+# By SnowFish
+    print(Fore.RED + f"{tool['name']} - Description (Français):")
+    print(Fore.CYAN + tool['description_fr'])
+# By SnowFish
+    open_url = click.confirm(Fore.YELLOW + "Voulez-vous ouvrir l'URL de l'outil dans le navigateur ?", default=True)
+    if open_url:
+        click.launch(tool['url'])
+        print(Fore.GREEN + f"L'URL a été ouverte dans le navigateur.")
+    else:
+        print(Fore.YELLOW + "Opération annulée.")
+    
+    back_to_main_menu = click.confirm(Fore.YELLOW + "Retourner au menu principal ?", default=True)
+    if back_to_main_menu:
+        print_main_menu()
+    else:
+        print(Fore.RED + "Au revoir !")
+        sys.exit(0)
+# By SnowFish
 @click.command()
 def main():
-    click.clear()  # Efface l'écran de la console
-    print_header()
-    click.echo(Fore.RED + "Bienvenue dans l'interface OSINT !")
-    
     while True:
-        click.echo(Fore.RED + "\nChoix disponibles :")  # Toujours en rouge
-        sorted_tools = sorted(TOOLS, key=lambda x: x['name'])
-        for index, tool in enumerate(sorted_tools, start=1):
-            click.echo(Fore.CYAN + f"{index: <3}) {tool['name']}")
-        click.echo(Fore.RED + " 0) Quitter")
-        
-        choice = click.prompt(Fore.RED + "Choisissez un outil (1-13)", type=int, default=0, show_default=False)
-        
-        if choice == 0:
-            click.echo(Fore.RED + "Au revoir !")
-            break
-        
-        if 1 <= choice <= len(sorted_tools):
-            tool = sorted_tools[choice - 1]
-            click.clear()  # Efface l'écran de la console
-            
-            print_header()
-            click.echo(Fore.RED + f"{tool['name']} - Description (English):")
-            click.echo(Fore.CYAN + tool['description_en'])  # Gris pour la description en anglais
-            click.echo("")  # Ligne vide pour décaler
-            
-            click.echo(Fore.RED + f"{tool['name']} - Description (Français):")
-            click.echo(Fore.CYAN + tool['description_fr'])  # Gris pour la description en français
-            
-            click.echo("")  # Ligne vide pour décaler
-            open_url = click.confirm(Fore.RED + "Voulez-vous ouvrir l'URL de l'outil dans le navigateur ?", default=True)
-            if open_url:
-                click.launch(tool['url'])  # Ouvre l'URL dans le navigateur
-                click.echo(Fore.GREEN + f"L'URL a été ouverte dans le navigateur.")
-            else:
-                click.echo(Fore.YELLOW + "Opération annulée.")
-        else:
-            click.echo(Fore.RED + "Choix invalide.")
-
+        print_main_menu()
+# By SnowFish
 if __name__ == "__main__":
     main()
-# By SnowFish
